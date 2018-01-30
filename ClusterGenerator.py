@@ -24,8 +24,8 @@ print("File path is "+plaintext_file_path)
 plaintext_lines =  len(open(plaintext_file_path,'rb').read().splitlines())
 print("Number of lines in file is "+str(plaintext_lines))
 
-##print("Command is ")
-##print('java', '-jar',jtcc_file_path,'file',plaintext_file_path)
+print("Command is ")
+print('java', '-jar',jtcc_file_path,'file',plaintext_file_path)
 
 
 def get_output(cmd, until):
@@ -35,6 +35,9 @@ def get_output(cmd, until):
     while True:
         ##print("current line:"+str(linenumber)+", until: "+str(until))
         line = p.stdout.readline()
+        line = line.replace(b'|',b'')
+        line = line.replace(b'\xe0\xb8?',b'\xe0\xb8\x81')
+        print(line)
         line = line.decode('utf8')
         ret.append(line)
         if str(linenumber)==str(until):
@@ -48,9 +51,9 @@ clusterarray = [plaintext_lines]
 clusterarray = get_output(['java','-jar',jtcc_file_path,'file',plaintext_file_path], until=plaintext_lines)
 
 
-for i in range (len(clusterarray)):
-    temp = clusterarray[i].split('|')
-    clusterarray[i]=temp
+##for i in range (len(clusterarray)):
+##    temp = clusterarray[i].split('|')
+##    clusterarray[i]=temp
     ##print ("current spliting at line: "+str(i))
 
 print("Generate Cluster Done")
