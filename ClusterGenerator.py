@@ -36,10 +36,12 @@ def get_output(cmd, until):
         ##print("current line:"+str(linenumber)+", until: "+str(until))
         line = p.stdout.readline()
         line = line.replace(b'|',b'')
-        line = line.replace(b'\xe0\xb8?',b'\xe0\xb8\x81')
+##        line = line.replace(b'\xe0\xb8?',b'\xe0\xb8\x81')
         print(line)
-        line = line.decode('utf8')
-        ret.append(line)
+##        line = line.decode('utf8')
+##        ret.append(line)
+        file = open("textfile.txt","wb")
+        file.write(line)
         if str(linenumber)==str(until):
             break
         linenumber = linenumber+1

@@ -61,56 +61,7 @@ def create_candidate(sentenceList,pointer,lenghtList,line):
                 return;
 ##            print(sepList4,pointer)
             candidate[line].append(sepList4)
-        
-print("Compatible with python 3 only.")
-##print("This is Thai Segmentation quiz, but it look very like the final thesis for the forth-year students.")
-
-root = tk.Tk()
-root.withdraw()
-print("Please input 'JTCC-0.1.jar' file")
-jtcc_file_path = filedialog.askopenfilename() #get file path for JTCC-0.1.jar
-print("JTCC path is "+jtcc_file_path)
-print("Please input plain text file")
-plaintext_file_path = filedialog.askopenfilename() #get file path for plaintext.txt
-print("File path is "+plaintext_file_path)
-
-plaintext_lines =  len(open(plaintext_file_path,'rb').read().splitlines())
-print("Number of lines in file is "+str(plaintext_lines))
-
-##print("Command is ")
-##print('java', '-jar',jtcc_file_path,'file',plaintext_file_path)
-
-def get_output(cmd, until):
-    linenumber=1
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-    ret = []
-    while True:
-        ##print("current line:"+str(linenumber)+", until: "+str(until))
-        line = p.stdout.readline()
-        line = line.decode("utf-8")
-        ret.append(line)
-        if str(linenumber)==str(until):
-            break
-        linenumber = linenumber+1
-    p.kill()
-    return ret
-
-##print (''.join(get_output(['java','-jar',jtcc_file_path,'file',plaintext_file_path], until=plaintext_lines)))
-clusterarray = [plaintext_lines]
-clusterarray = get_output(['java','-jar',jtcc_file_path,'file',plaintext_file_path], until=plaintext_lines)
-
-for i in range (len(clusterarray)):
-    temp = clusterarray[i].split('|')
-    clusterarray[i]=temp
-    ##print ("current spliting at line: "+str(i))
-
-print("Generate Cluster Done")
-print(clusterarray)
-####This is for checking cluster array
-##for i in range (len(clusterarray)):
-##    for j in range (len(clusterarray[i])):
-##        print("i: "+str(i)+" j: "+str(j)+" text: "+clusterarray[i][j])
-
+            
 ##dictionary = json.load(open('thaiwordlist.json', encoding="utf8"))
 with open("thaiwordlist.txt", encoding="utf8") as f:
     dictionary = f.readlines()
@@ -124,7 +75,7 @@ f_input = [["ท","ด","ส","อ","บ","กา","ร","แบ่","ง","ค�
 
 candidate = []
 line = 0
-for sentence in clusterarray:
+for sentence in f_input:
     candidate.append([])
     create_candidate(sentence,0,len(sentence)-1,line)
     line += 1
