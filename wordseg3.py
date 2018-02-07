@@ -9,80 +9,94 @@ def searching(word):
 
 def create_candidate(sentenceList,pointer,lenghtList,line):
     global counter
-    if pointer == lenghtList:       #base case
+    if pointer > lenghtList:       #base case
         return sentenceList
     else:                               #recursive loop
-        current_word = sentenceList[pointer]+sentenceList[pointer+1]
+        current_word = sentenceList[pointer]
 ##        print(current_word)
-        if any([l.startswith(current_word) for l in dictionary]):            
-            sepList2 = list(sentenceList)
-            current_word2 = current_word
-##            print("currentword2",current_word2)
-            while(any([l.startswith(current_word2) for l in dictionary])):
-##                print("Type: "+str(type(sepList2))+current_word2)
-                if(pointer != len(sepList2)-2):
-                    sepList2[pointer] = sepList2[pointer]+sepList2[pointer+1]
-                    del sepList2[pointer+1]
-                    current_word2 = sepList2[pointer]+sepList2[pointer+1]
-                    if searching(current_word2):
-##                        print("Run candidate"+str(pointer)+" "+str(len(sepList2)-1))
-                        sepList2 = create_candidate(sepList2,pointer,len(sepList2)-1,line)
-                        if(sepList2!=None):
-##                            print(sepList2,pointer)
-                            counter+=1
-                            print("counter",counter,sepList2)
-                            candidate[line].append(sepList2)
-                        break
-                else:
-                    break
         if searching(current_word):
-            sepList = list(sentenceList)
-            sepList3 = list(sentenceList)
-            sepList[pointer] = sepList[pointer]+sepList[pointer+1]
-            del sepList[pointer+1]
-            if(pointer<lenghtList-1):
-                sepList = create_candidate(sepList,pointer+1,lenghtList-1,line) 
-##            sepList3 = create_candidate(sepList3,pointer+1,lenghtList,line)
-            if(sepList!=None):
-##                print(sepList,pointer)
+            sepList1 = list(sentenceList)
+            sepList1 = create_candidate(sepList1,pointer+1,lenghtList,line)
+            if(sepList1 != None):
                 counter+=1
-                print("counter",counter,sepList)
-                candidate[line].append(sepList)
-##            if(sepList3!=None):
-####                print(sepList3,pointer)
-##                candidate[line].append(sepList3)            
+##                print("counter",counter,sepList1)
+                candidate[line].append(sepList1)
+            if (any([l.startswith(current_word) for l in dictionary])) and (not pointer+1 > lenghtList):
+                sepList2 = list(sentenceList)
+                sepList2[pointer] = sepList2[pointer]+sepList2[pointer+1]
+                del sepList2[pointer+1]
+                sepList2 = create_candidate(sepList2,pointer,lenghtList-1,line)
             return
-        else:
-            sepList4 = list(sentenceList)
-            sepList4 = create_candidate(sepList4,pointer+1,lenghtList,line)
-            if(sepList4==None):
-                return;
-##            print(sepList4,pointer)
-            candidate[line].append(sepList4)
+        elif (not searching(current_word)) and (not pointer+1 > lenghtList):
+            if (any([l.startswith(current_word) for l in dictionary])):
+                sepList3 = list(sentenceList)
+                sepList3[pointer] = sepList3[pointer]+sepList3[pointer+1]
+                del sepList3[pointer+1]
+                sepList3 = create_candidate(sepList3,pointer,lenghtList-1,line)
+            else:
+                return              
         
-                    
-##dictionary = json.load(open('thaiwordlist.json', encoding="utf8"))
+def merge_back(pointer,namelist):
+    namelist[pointer] = namelist[pointer]+namelist[pointer+1]
+    del namelist[pointer+1]
+    return namelist
+
+def merge_front(pointer,namelist):
+    namelist[pointer] = namelist[pointer-1]+namelist[pointer]
+    del namelist[pointer-1]
+    return namelist
+
+## Main Program
 with open("thaiwordlist.txt", encoding="utf8") as f:
     dictionary = f.readlines()
-# you may also want to remove whitespace characters like `\n` at the end of each line
 dictionary = [x.strip() for x in dictionary] 
 dictionary2 = ["ทด","แทน","ท","ด","ส","อ","บ","ดอกเบี้ย","ทดสอบ","แบ่งคำ"]
 print("Dictionary list is loaded")
+
+###Tester part
 counter = 0
-f_input = [["ท","ด","ส","อ","บ","กา","ร","แบ่","ง","คำ"],
-           ["เสา","ร์","นี้","ไป","ไห","น","ไก่","กา","ตา","ก","ล","ม","จับ","ตา","ดู","ด","อ","ก","เบี้ย"]]
-f_input2 = [["ค","บ","ค","น","พา","ล","พา","ไป","หา","ผิ","ด","ค","บ","บัณ","ฑิต","บัณ","ฑิต","พา","ไป","หา","ผ","ล"]]
-
-string = "เสาร์นี้ไปไหนไก่กาตากลมจับตาดูดอกเบี้ย"
+string = "คบคนพาลพาลพาไปหาผิดคบบัณฑิตบัณฑิตพาไปหาผล"
 string2 = [list(string)]
+for a in string2:
+    if ' ' in a:
+        a.remove(' ')
 
+# Cluster creation
+front_vowel = ["เ","แ","โ","ใ","ไ"]
+back_vowel = ["ะ","า","ิ","ี","ึ","ื","ุ","ู","ั","ำ","ๅ","์","ํ","่","้","๊","๋","็"]
+for i in range(len(string2)):
+    j = 0
+    while string2[i][j] != None:
+        checker = string2[i][j]
+        if checker in front_vowel:
+            string2[i] = merge_back(j,string2[i])
+        elif checker in back_vowel:
+            string2[i] = merge_front(j,string2[i])
+            j = j-1
+            while (checker == "ั" or checker == "ื") and string2[i][j][-1] in back_vowel:
+                string2[i] = merge_back(j,string2[i])
+            if checker == "็":
+                string2[i] = merge_back(j,string2[i])
+            elif (checker == "ื" or checker == "ี") and ("เ" in string2[i][j]):
+                y = j
+                while string2[i][y] != "ย":
+                    string2[i] = merge_back(j,string2[i])
+                    y = y+1
+                string2[i] = merge_back(j,string2[i])
+        j = j+1
+        if j == len(string2[i]):
+            break
+print("Cluster: ",string2)
+
+#Candidate Creation
 candidate = []
 line = 0
-for sentence in f_input2:
+for sentence in string2:
     candidate.append([])
     create_candidate(sentence,0,len(sentence)-1,line)
     line += 1
+
+#Printing output
 for i in range(len(candidate)):
     for j in range(len(candidate[i])):
-        print(i,j,candidate[i][j])
-
+        print("Line "+str(i+1),"Candidate "+str(j+1),candidate[i][j])
