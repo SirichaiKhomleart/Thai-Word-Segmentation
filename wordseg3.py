@@ -55,6 +55,13 @@ def create_candidate(sentenceList,pointer,lenghtList,line,token):
                     sepList3 = create_candidate(sepList3,pointer+1,lenghtList,line,token)
                 elif (sepList3 == [] and token == 2):
                     return []
+            elif(current_word == " "):
+                token = 0
+                sepList1 = list(sentenceList)
+                sepList1 = create_candidate(sepList1,pointer+1,lenghtList,line,token)
+                if(sepList1 != None):
+                    counter+=1
+                    candidate[line].append(sepList1)
             else:
                 return []
         
@@ -73,49 +80,50 @@ stime = time.time()
 with open("thaiwordlist.txt", encoding="utf8") as f:
     dictionary = f.readlines()
 dictionary = [x.strip() for x in dictionary] 
-dictionary2 = ["ทด","แทน","ท","ด","ส","อ","บ","ดอกเบี้ย","ทดสอบ","แบ่งคำ"]
 print("Dictionary list is loaded")
 
 ###Tester part
 counter = 0
-string = "คบคนพาลพาลพาไปหาผิดคบบัณฑิตบัณฑิตพาไปหาผลเด็กตากลมนั่งตากลมตากแดด"
-string1 = "พศินเมื่อไหร่"
-string2 = [list(string)]
-for a in string2:
-    if ' ' in a:
-        a.remove(' ')
+testString = "คบคนพาลพาลพาไปหาผิดคบบัณฑิตบัณฑิตพาไปหาผลเด็กตากลมนั่งตากลมตากแดด"
+testString = "พศินเมื่อไหร่"
+
+# Read file for input
+with open("thaiword.txt",encoding = "utf8") as f:
+    mylist = f.read().splitlines()
+inputfile = [list(x) for x in mylist]
+inputfile[0].remove('\ufeff')
 
 # Cluster creation
 front_vowel = ["เ","แ","โ","ใ","ไ"]
 back_vowel = ["ะ","า","ิ","ี","ึ","ื","ุ","ู","ั","ำ","ๅ","์","ํ","่","้","๊","๋","็"]
-for i in range(len(string2)):
+for i in range(len(inputfile)):
     j = 0
-    while string2[i][j] != None:
-        checker = string2[i][j]
+    while inputfile[i][j] != None:
+        checker = inputfile[i][j]
         if checker in front_vowel:
-            string2[i] = merge_back(j,string2[i])
+            inputfile[i] = merge_back(j,inputfile[i])
         elif checker in back_vowel:
-            string2[i] = merge_front(j,string2[i])
+            inputfile[i] = merge_front(j,inputfile[i])
             j = j-1
-            while (checker == "ั" or checker == "ื") and string2[i][j][-1] in back_vowel:
-                string2[i] = merge_back(j,string2[i])
+            while (checker == "ั" or checker == "ื") and inputfile[i][j][-1] in back_vowel:
+                inputfile[i] = merge_back(j,inputfile[i])
             if checker == "็":
-                string2[i] = merge_back(j,string2[i])
-            elif (checker == "ื" or checker == "ี") and ("เ" in string2[i][j]) and (string2[i][j][-1] != "ย" and string2[i][j][-1] != "อ"):
-                y = j+1
-                while (string2[i][y] != "ย"):
-                    string2[i] = merge_back(j,string2[i])
+                inputfile[i] = merge_back(j,inputfile[i])
+            elif (checker == "ื" or checker == "ี") and ("เ" in inputfile[i][j]) and (inputfile[i][j][-1] != "ย" and inputfile[i][j][-1] != "อ"):
+                y = j
+                while (inputfile[i][j][-1] != "ย" and inputfile[i][j][-1] != "อ"):
+                    inputfile[i] = merge_back(j,inputfile[i])
                     y = y+1
-                string2[i] = merge_back(j,string2[i])
+
         j = j+1
-        if j == len(string2[i]):
+        if j == len(inputfile[i]):
             break
-print("Cluster: ",string2)
+print("Cluster: ",inputfile)
 
 #Candidate Creation
 candidate = []
 line = 0
-for sentence in string2:
+for sentence in inputfile:
     candidate.append([])
     create_candidate(sentence,0,len(sentence)-1,line,0)
     line += 1
