@@ -3,7 +3,7 @@ import time
 
 def searching(word):
     if word in dictionary:
-##        print(word, "This word is in a dictionary.")
+        print(word, "This word is in a dictionary.")
         return True
     else:
         return False
@@ -14,7 +14,7 @@ def create_candidate(sentenceList,pointer,lenghtList,line,token):
         return sentenceList
     else:                               #recursive loop
         current_word = sentenceList[pointer]
-##        print(current_word)
+        print(current_word)
         if searching(current_word):
             token = 0
             sepList1 = list(sentenceList)
