@@ -16,10 +16,6 @@ import math
 
 
 #Initial setup
-#Ask for Operating System
-print("Please specify your Operating System (Windows or macOS?)")
-OS = input("--> I am using [W/M]: ")
-
 #Loading text file
 if(os.path.isfile("thaiword.txt")):
     input_file_path = "thaiword.txt"
@@ -30,7 +26,7 @@ print("--> Reading plain text file...")
 with open(input_file_path,encoding = "utf8") as f:
     mylist = f.read().splitlines()
 inputfile = [list(x) for x in mylist]
-if (OS=="W"):
+if ('\ufeff' in inputfile[0]):
     inputfile[0].remove('\ufeff')
 
 #Loading Dictionary
@@ -43,7 +39,6 @@ print("--> Loading dictionary...")
 with open(thaidict_file_path, encoding="utf8") as f:
     dictionary = f.readlines()
 dictionary = [x.strip() for x in dictionary]
-print("--> Dictionary is loaded.")
 
 
 
@@ -208,6 +203,14 @@ counter = 0
 front_vowel = ["เ","แ","โ","ใ","ไ"]
 back_vowel = ["ะ","า","ิ","ี","ึ","ื","ุ","ู","ั","ำ","ๅ","์","ํ","่","้","๊","๋","็"]
 sym = ["1","2","3","4","5","6","7","8","9","0","ฯ",",","!","@","#","$","%","^","&","*","+","-","/","\'","_","ๆ","ฯ",".",":",";","(",")","[","]","{","}","|","๑","๒","๓","๔","๕","฿","๖","๗","๘","๙","๐","?","๚","<",">"]
+blank_line=[] ##handle blank line in input file
+inputfile_noblank=[]
+for i in range(len(inputfile)):  ##handle blank line in input file
+    if (len(inputfile[i])==0):
+        blank_line.append(i)
+    else:
+        inputfile_noblank.append(inputfile[i])
+inputfile=inputfile_noblank
 for i in range(len(inputfile)):
     j = 0
     while inputfile[i][j] != None:
@@ -294,6 +297,7 @@ for i in range(len(index3_array)):
 
 #Calculate probability (Using Minimum Word Count > Trigram > Bigram > Monogram)
 answer = []
+error=False
 for line in candidate_array:
         minwordIndex = math.inf
         for i in range(len(line)):
@@ -322,8 +326,9 @@ for line in candidate_array:
             if (len(maxprobArray) == 1):
                 answer.append(selectCandidate[0])
             elif (len(maxprobArray) < 1):
-                print("error occur with maxprobArray")
-                print("error is here: ",maxprobArray)
+                #print("----> Error occur with maxprobArray")
+                error=True
+                answer.append(["<<This line contains unacceptable characters/language>>"])
 
 
             else:
@@ -342,7 +347,9 @@ for line in candidate_array:
                 if (len(maxMonogramProb) == 1):
                     answer.append(maxMonogramProb[0])
                 elif (len(maxMonogramProb) < 1):
-                    print("error occur with maxMonogramProb")
+                    #print("----> Error occur with maxMonogramProb")
+                    error=True
+                    answer.append(["<<This line contains unacceptable characters/language>>"])
                 else:
                     maxprobMONO = 0
                     maxprobIndexMONO = 0
@@ -355,20 +362,45 @@ for line in candidate_array:
                             maxprobIndexMONO = i
                             ##print("currprob " + str(currprob))
                     answer.append(maxMonogramProb[maxprobIndexMONO])
+answer_withBlankLine=[]
+temp=len(answer)+len(blank_line)
+counter=0
+try:
+    for i in range(temp):
+        if i in blank_line:
+            answer_withBlankLine.append([])
+            counter+=1
+        else:
+            answer_withBlankLine.append(answer[i-counter])
+    answer=answer_withBlankLine
+except:
+    error=True
+if (error==True):
+    print("\n<<< Error occured! >>>\n<<< There are some unacceptable characters inside input text file >>>")
+    print("<<< Other languages but Thai are not supported yet >>>\n<<< as well as special characters >>>\n")
 
-print("Segmentation Done!")
-print(" ")
+print("Segmentation Done!\n")
 print("-------answer-------")
-print(" ")
 for line in answer:
     print ("|".join(line))
+print("--------------------\n")
 
 #Calculate execution time
-print("")
-print("--------------------")
 endtime = time.time()
 print("Execution Time: "+str(endtime-starttime)+" seconds.")
 
 
 
-#Footer
+# README!!!
+# This is the university project that aims to the study of information retrieval.
+# ------------------------------
+# Sirindhorn International Institute of Technology
+# Thammasat University
+#
+# CSS432 - Information Retrieval          Section 1
+# Semester 2          Year 2017
+#
+# Members
+# 1     5822781910    Mr.Sirichai    Khomleart
+# 2     5822782421    Mr.Pasin       Jiratthiticheep
+# 3     5822782546    Mr.Nuttapol  Saiboonruen
