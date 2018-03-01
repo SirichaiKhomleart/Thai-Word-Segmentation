@@ -52,7 +52,7 @@ def searching(word):
 
 def create_candidate(sentenceList, pointer, lenghtList, line, token):
     global counter
-    if pointer > lenghtList:  # base case
+    if (pointer > lenghtList) or ((pointer >= lenghtList) and (sentenceList[pointer] in sym)):  # base case
         return sentenceList
     else:  # recursive loop
         current_word = sentenceList[pointer]
@@ -240,9 +240,9 @@ for sentence in inputfile:
     candidate.append([])
     create_candidate(sentence,0,len(sentence)-1,line,0)
     line += 1
-# for i in range(len(candidate)):
-#     for j in range(len(candidate[i])):
-#         print("----> Line "+str(i+1)," Candidate "+str(j+1),candidate[i][j])
+#for i in range(len(candidate)):
+    #for j in range(len(candidate[i])):
+         #print("----> Line "+str(i+1)," Candidate "+str(j+1),candidate[i][j])
 
 #Step 3: Probability Calculation
 print("--> Begin Probability Calculation")
