@@ -26,6 +26,7 @@ print("--> Reading plain text file...")
 with open(input_file_path,encoding = "utf8") as f:
     mylist = f.read().splitlines()
 inputfile = [list(x) for x in mylist]
+print(mylist)
 if ('\ufeff' in inputfile[0]):
     inputfile[0].remove('\ufeff')
 
